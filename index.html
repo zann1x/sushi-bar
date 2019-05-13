@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>F&P Sushi-Bar</title>
+    </head>
+    <body>
+        <h3>Sushi-Bar</h3>
+
+        <form id="formNewGuests">
+            Number of new guests: <input type="text" id="newGuests" name="newGuests">
+            <input type="button" onclick="onNewGuests()" value="Submit">
+        </form>
+
+        <form id="formLeavingGuests">
+            Group leaving: <input type="text" id="leavingGuests" name="leavingGuests">
+            <input type="button" onclick="onLeavingGuests()" value="Submit">
+        </form>
+
+        <p id="guestTable"></p>
+
+        <script src="seat-picker.js"></script>
+        <script>
+            var sp = new SeatPicker(10);
+
+            function onNewGuests() {
+                var numberOfNewGuests = document.getElementById("newGuests").value;
+                if (numberOfNewGuests == 0 || isNaN(numberOfNewGuests)) {
+                    return;
+                }
+                sp.addGuests(numberOfNewGuests);
+                document.getElementById("guestTable").innerHTML = sp.seats;
+            }
+
+            function onLeavingGuests() {
+                var groupId = document.getElementById("leavingGuests").value;
+                if (isNaN(groupId)) {
+                    console.log("Only numbers are allowed!");
+                    return;
+                }
+                sp.removeGuestGroup(groupId);
+                document.getElementById("guestTable").innerHTML = sp.seats;
+            }
+        </script>
+    </body>
+</html>
