@@ -155,29 +155,51 @@ class SeatPicker {
     }
 
     pickFreeSeatRow(groupSize, availableSeats) {
-        var indexOfLowestDistance = -1;
+        var pickedRowIndex = -1;
+        var isPickLeftAligned = true;
 
-        // Pick the seat row that is sizewise closest to the group.
-        // TODO: pick the row that is additionally closest to the highest group id ?
-        {
-            var lowestDistance = Number.MAX_SAFE_INTEGER;
-            for (var i = 0; i < availableSeats.length; ++i) {
-                var distance = availableSeats[i].length - groupSize;
+        // Pick the seat row that is sizewise closest to the group and that is closest to the highest group id
+        var highestGroupId = -1;
+        var lowestSeatRowLength = availableSeats[0].length;
+        for (var i = 0; i < availableSeats.length; ++i) {
+            if (availableSeats[i].length != lowestSeatRowLength) {
+                break;
+            }
+            
+            var currentRow = availableSeats[i];
 
-                if (distance == 0) {
-                    indexOfLowestDistance = i;
-                    break;
-                } else if (distance < 0) {
-                    indexOfLowestDistance = i - 1;
-                    break;
-                } else if (distance < lowestDistance) {
-                    lowestDistance = distance;
-                    indexOfLowestDistance = i;
-                }
+            // Determine the group id on both sides of the current seat row
+            var leftGroupId = this.seats[this.decrementSeatIndex(currentRow[0])];
+            var rightGroupId = this.seats[this.incrementSeatIndex(currentRow[currentRow.length - 1])];
+            var currentHighestGroupId = -1;
+
+            // Pick the group id that is higher so the group is placed next to another group that will still spend
+            // about the same amount of time in the restaurant. Groups that are still in the restaurant are therefore
+            // more or less tightly packed together and give more room to bigger groups possibly coming in the future.
+            if (rightGroupId > leftGroupId) {
+                currentHighestGroupId = rightGroupId;
+                isPickLeftAligned = false;
+            } else {
+                currentHighestGroupId = leftGroupId;
+                isPickLeftAligned = true;
+            }
+
+            if (currentHighestGroupId > highestGroupId) {
+                highestGroupId = currentHighestGroupId;
+                pickedRowIndex = i;
             }
         }
 
-        return availableSeats[indexOfLowestDistance];
+        // Depending on which side the group should be placed closer to, the seat indices are cut so that
+        // only the seats that the group should be placed at are left
+        var deleteCount = availableSeats[pickedRowIndex].length - groupSize;
+        if (!isPickLeftAligned) {
+            availableSeats[pickedRowIndex].splice(0, deleteCount);
+        } else {
+            availableSeats[pickedRowIndex].splice(groupSize, deleteCount);
+        }
+
+        return availableSeats[pickedRowIndex];
     }
 
     incrementSeatIndex(seatIndex) {
@@ -185,9 +207,9 @@ class SeatPicker {
     }
 
     decrementSeatIndex(seatIndex) {
-        var index = seatIndex - 1;
         // All props for this syntax go to a javascript modulo bug with negative numbers
         // (see https://web.archive.org/web/20090717035140if_/javascript.about.com/od/problemsolving/a/modulobug.htm)
+        var index = seatIndex - 1;
         return ((index % this.seats.length) + this.seats.length) % this.seats.length;
     }
 }
