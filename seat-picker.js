@@ -9,8 +9,11 @@ class SeatPicker {
         for (var i = 0; i < numberOfSeats; ++i) {
             this.seats[i] = this.EMPTY;
         }
-        this.uniqueGroupId = -1;
+        this.uniqueGroupId = 0;
         this.numberOfGuests = 0;
+
+        $("#numberOfSeats").prop("placeholder", "Currently: " + this.seats.length);
+        $("#guestTable").text(this.seats);
     }
 
     addGuests(groupSize) {
@@ -65,8 +68,8 @@ class SeatPicker {
         }
 
         // Check boundaries
-        if (uniqueGroupId < 0) {
-            $("#formLeavingGuestsFeedback").text("The group id needs to be greater or equal to 0.");
+        if (uniqueGroupId <= 0) {
+            $("#formLeavingGuestsFeedback").text("The group id needs to be greater than 0.");
             return;
         } else if (uniqueGroupId > this.uniqueGroupId) {
             $("#formLeavingGuestsFeedback").text("No group with id " + uniqueGroupId + " found.");

@@ -12,6 +12,17 @@
         <div class="container">
             <h2>F&P Sushi-Bar</h2>
 
+            <form id="formNumberOfSeats">
+                <div class="form-group">
+                    <label for="numberOfSeats">Number of seats:</label>
+                    <input class="form-control" type="text" id="numberOfSeats" name="numberOfSeats" placeholder="Currently: ">
+                    <small id="numberOfSeatsHelp" class="form-text text-muted">Heads up! Changing this number resets all seats!</small>
+                </div>
+                <button type="submit" class="btn btn-secondary">Change</button>
+            </form>
+
+            <hr>
+
             <form id="formNewGuests">
                 <div class="form-group">
                     <label for="newGuests">Number of new guests:</label>
@@ -24,7 +35,7 @@
 
             <form id="formLeavingGuests">
                 <div class="form-group">
-                    <label for="leavingGuests">Number of new guests:</label>
+                    <label for="leavingGuests">Id of the group leaving:</label>
                     <input class="form-control" type="text" id="leavingGuests" name="leavingGuests">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -32,8 +43,9 @@
 
             <p class="p-feedback" id="formLeavingGuestsFeedback"></p>
             
-            <br>
-            <p class="font-weight-bold">Seats: <span class="text-monospace">[ <span id="guestTable"></span> ]</span></p>            
+            <hr>
+
+            <p class="text-justify font-weight-bold">Seats: <span class="text-monospace">[ <span id="guestTable"></span> ]</span></p>            
         </div>        
 
         <!-------------------------------->
@@ -47,7 +59,16 @@
         <script src="seat-picker.js"></script>
         <script>
             var sp = new SeatPicker(10);
-            $("#guestTable").text(sp.seats);
+
+            $("#formNumberOfSeats").on("submit", function(e) {
+                var numberOfSeats = $("#numberOfSeats").val();
+                if (!isNaN(numberOfSeats) && numberOfSeats != "" && numberOfSeats > 0) {
+                    sp = new SeatPicker(numberOfSeats);
+                } else {
+                    alert("Please enter a number bigger than 0.");
+                }
+                e.preventDefault();
+            })
 
             $("#formNewGuests").on("submit", function(e) {
                 var numberOfNewGuests = $("#newGuests").val();
