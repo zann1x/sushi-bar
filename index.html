@@ -24,7 +24,7 @@
 
             function onNewGuests() {
                 var numberOfNewGuests = document.getElementById("newGuests").value;
-                if (numberOfNewGuests == 0 || isNaN(numberOfNewGuests)) {
+                if (isNaN(numberOfNewGuests)) {
                     return;
                 }
                 sp.addGuests(numberOfNewGuests);
@@ -34,7 +34,6 @@
             function onLeavingGuests() {
                 var groupId = document.getElementById("leavingGuests").value;
                 if (isNaN(groupId)) {
-                    console.log("Only numbers are allowed!");
                     return;
                 }
                 sp.removeGuestGroup(groupId);

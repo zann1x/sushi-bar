@@ -2,6 +2,7 @@ class SeatPicker {
     EMPTY = -1;
     seats = [];
     uniqueGroupId = -1;
+    numberOfGuests = -1;
 
     constructor(numberOfSeats) {
         this.seats = new Array(numberOfSeats);
@@ -9,46 +10,71 @@ class SeatPicker {
             this.seats[i] = this.EMPTY;
         }
         this.uniqueGroupId = -1;
+        this.numberOfGuests = 0;
 
         console.log(this);
     }
 
     addGuests(groupSize) {
-        if (groupSize > this.seats.length) {
-            console.log("The group is too big for this restaurant! (addGuests)");
+        // Check the boundaries
+        if (groupSize <= 0) {
+            console.log("Only positive numbers are allowed. (addGuests)");
+            return;
+        } else if (groupSize > this.seats.length) {
+            console.log("The group is too big for this restaurant. (addGuests)");
             return;
         }
 
-        var seatNumbers = this.findBestSeats(groupSize);
+        if(groupSize > this.seats.length - this.numberOfGuests) {
+            console.log("Not enough free seats available. (addGuests)");
+            return;
+        }
+
+        // Look for free seats available for this group and get the indices of the most suitable ones in a row
+        var seatNumbers = this.findBestFreeSeats(groupSize);
         if (seatNumbers == null) {
-            console.log("No findBestSeats seat numbers were found (addGuests)");
+            console.log("No findBestFreeSeats seat numbers were found. (addGuests)");
             return;
         }
 
+        // Set the group id for the selected seats
         ++this.uniqueGroupId;
         for(var i = 0; i < groupSize; ++i) {
             this.seats[seatNumbers[i]] = this.uniqueGroupId;
         }
+        this.numberOfGuests += parseInt(groupSize, 10);
 
         console.log(this);
     }
 
     removeGuestGroup(uniqueGroupId) {
-        if (this.seats.findIndex(element => element == uniqueGroupId) == -1) {
-            console.log("No such group found (id=" + uniqueGroupId + ")");
+        // Check boundaries
+        if (uniqueGroupId < 0) {
+            console.log("Group Ids need to be >= 0. (removeGuestGroup)");
+            return;
+        } else if (uniqueGroupId > this.uniqueGroupId) {
+            console.log("No group with id " + uniqueGroupId + " found. (removeGuestGroup)");
             return;
         }
 
+        // Check if the supplied group exists
+        if (this.seats.findIndex(element => element == uniqueGroupId) == -1) {
+            console.log("No group with id " + uniqueGroupId + " found. (removeGuestGroup)");
+            return;
+        }
+
+        // Clear the seats of the leaving group
         for(var i = 0; i < this.seats.length; ++i) {
             if (this.seats[i] == uniqueGroupId) {
                 this.seats[i] = this.EMPTY;
+                --this.numberOfGuests;
             }
         }
 
         console.log(this);
     }
 
-    findBestSeats(groupSize) {
+    findBestFreeSeats(groupSize) {
         var availableSeats = [];
     
         // If the seat array is completely empty, an array with all seats is returned
@@ -57,19 +83,14 @@ class SeatPicker {
                 availableSeats.push(i);
             }
             return availableSeats;
-        } else if (this.seats.findIndex(element => element == this.EMPTY) == -1) {
-            // No free seats were found
-            console.log("No free seats available (findBestSeats)");
-            return null;
         }
 
         availableSeats = this.findAllFreeSeatsInARow();
-
         if (availableSeats == null) {
-            console.log("Not enough seats in a row available! (findBestSeats)");
+            console.log("Not enough seats in a row available! (findBestFreeSeats)");
             return null;
         } else if (availableSeats[0].length < groupSize) {
-            console.log("Not enough free seats in a row available for this group! (findBestSeats)");
+            console.log("Not enough free seats in a row available for this group! (findBestFreeSeats)");
             return null;
         }
 
@@ -150,7 +171,7 @@ class SeatPicker {
 
     decrementSeatIndex(seatIndex) {
         var index = seatIndex - 1;
-        // All props for this syntax go to a javascript modulo bug
+        // All props for this syntax go to a javascript modulo bug with negative numbers
         // (see https://web.archive.org/web/20090717035140if_/javascript.about.com/od/problemsolving/a/modulobug.htm)
         return ((index % this.seats.length) + this.seats.length) % this.seats.length;
     }
