@@ -85,11 +85,22 @@ class SeatPicker {
             return availableSeats;
         }
 
+        // Get an array of arrays of indices of free seats in a row. A seat row with more free seats
+        // are further at the back of the array
         availableSeats = this.findAllFreeSeatsInARow();
         if (availableSeats == null) {
             console.log("Not enough seats in a row available! (findBestFreeSeats)");
             return null;
-        } else if (availableSeats[0].length < groupSize) {
+        }
+
+        // Remove seat rows that do not suffice the group's size
+        for (var i = 0; i < availableSeats.length; ++i) {
+            if (availableSeats[i].length < groupSize) {
+                availableSeats.splice(i, 1);
+                --i;
+            }
+        }
+        if (availableSeats.length == 0) {
             console.log("Not enough free seats in a row available for this group! (findBestFreeSeats)");
             return null;
         }
@@ -126,8 +137,8 @@ class SeatPicker {
             if (availableSeats.length == 0) {
                 availableSeats.push(seatsInQuestion);
             } else {
-                // Put parts that have more seats in a row available at the front of the array
-                if (seatsInQuestion.length >= availableSeats[0].length) {
+                // Put parts that have less seats in a row available at the front of the array
+                if (seatsInQuestion.length <= availableSeats[0].length) {
                     availableSeats.unshift(seatsInQuestion);
                 } else {
                     availableSeats.push(seatsInQuestion);
@@ -144,21 +155,25 @@ class SeatPicker {
     }
 
     pickFreeSeatRow(groupSize, availableSeats) {
-        var lowestDistance = Number.MAX_SAFE_INTEGER;
         var indexOfLowestDistance = -1;
 
         // Pick the seat row that is sizewise closest to the group.
         // TODO: pick the row that is additionally closest to the highest group id ?
-        for (var i = 0; i < availableSeats.length; ++i) {
-            var distance = availableSeats[i].length - groupSize;
+        {
+            var lowestDistance = Number.MAX_SAFE_INTEGER;
+            for (var i = 0; i < availableSeats.length; ++i) {
+                var distance = availableSeats[i].length - groupSize;
 
-            if (distance == 0) {
-                return availableSeats[i];
-            } else if (distance < 0) {
-                return availableSeats[i - 1];
-            } else if (distance < lowestDistance) {
-                lowestDistance = distance;
-                indexOfLowestDistance = i;
+                if (distance == 0) {
+                    indexOfLowestDistance = i;
+                    break;
+                } else if (distance < 0) {
+                    indexOfLowestDistance = i - 1;
+                    break;
+                } else if (distance < lowestDistance) {
+                    lowestDistance = distance;
+                    indexOfLowestDistance = i;
+                }
             }
         }
 

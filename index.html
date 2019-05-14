@@ -21,6 +21,7 @@
         <script src="seat-picker.js"></script>
         <script>
             var sp = new SeatPicker(10);
+            document.getElementById("guestTable").innerHTML = sp.seats;
 
             function onNewGuests() {
                 var numberOfNewGuests = document.getElementById("newGuests").value;
