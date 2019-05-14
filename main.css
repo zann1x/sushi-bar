@@ -1,0 +1,9 @@
+body {
+    background-image: url("sushi.png");
+    background-position: right top;
+    background-repeat: no-repeat;
+}
+
+.p-feedback {
+    color: red;
+}

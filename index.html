@@ -1,45 +1,65 @@
-<html>
+<!doctype html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>F&P Sushi-Bar</title>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="main.css">
     </head>
     <body>
-        <h3>Sushi-Bar</h3>
+        <div class="container">
+            <h2>F&P Sushi-Bar</h2>
 
-        <form id="formNewGuests">
-            Number of new guests: <input type="text" id="newGuests" name="newGuests">
-            <input type="button" onclick="onNewGuests()" value="Submit">
-        </form>
+            <form id="formNewGuests">
+                <div class="form-group">
+                    <label for="newGuests">Number of new guests:</label>
+                    <input class="form-control" type="text" id="newGuests" name="newGuests">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
 
-        <form id="formLeavingGuests">
-            Group leaving: <input type="text" id="leavingGuests" name="leavingGuests">
-            <input type="button" onclick="onLeavingGuests()" value="Submit">
-        </form>
+            <p class="p-feedback" id="formNewGuestsFeedback"></p>            
 
-        <p id="guestTable"></p>
+            <form id="formLeavingGuests">
+                <div class="form-group">
+                    <label for="leavingGuests">Number of new guests:</label>
+                    <input class="form-control" type="text" id="leavingGuests" name="leavingGuests">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+            <p class="p-feedback" id="formLeavingGuestsFeedback"></p>
+            
+            <br>
+            <p class="font-weight-bold">Seats: <span class="text-monospace">[ <span id="guestTable"></span> ]</span></p>            
+        </div>        
+
+        <!-------------------------------->
+        <!--        JAVASCRIPT          -->
+        <!-------------------------------->
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
         <script src="seat-picker.js"></script>
         <script>
             var sp = new SeatPicker(10);
-            document.getElementById("guestTable").innerHTML = sp.seats;
+            $("#guestTable").text(sp.seats);
 
-            function onNewGuests() {
-                var numberOfNewGuests = document.getElementById("newGuests").value;
-                if (isNaN(numberOfNewGuests)) {
-                    return;
-                }
+            $("#formNewGuests").on("submit", function(e) {
+                var numberOfNewGuests = $("#newGuests").val();
                 sp.addGuests(numberOfNewGuests);
-                document.getElementById("guestTable").innerHTML = sp.seats;
-            }
+                e.preventDefault();
+            })
 
-            function onLeavingGuests() {
-                var groupId = document.getElementById("leavingGuests").value;
-                if (isNaN(groupId)) {
-                    return;
-                }
+            $("#formLeavingGuests").on("submit", function(e) {
+                var groupId = $("#leavingGuests").val();
                 sp.removeGuestGroup(groupId);
-                document.getElementById("guestTable").innerHTML = sp.seats;
-            }
+                e.preventDefault();
+            })
         </script>
     </body>
 </html>
