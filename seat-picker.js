@@ -16,25 +16,19 @@ class SeatPicker {
         $("#guestTable").text(this.seats);
     }
 
+    static isInputValid(input) {
+        return (input != "" && !isNaN(parseInt(input)) && input > 0);
+    }
+
     addGuests(groupSize) {
         $("#formNewGuestsFeedback").text("");
 
-        if (groupSize == "") {
-            return;
-        } else if (isNaN(groupSize)) {
-            $("#formNewGuestsFeedback").text("Only numbers are allowed.");
+        if (!SeatPicker.isInputValid(groupSize)) {
+            $("#formNewGuestsFeedback").text("Invalid input. Only numbers bigger 0 are allowed.");
             return;
         }
 
-        // Check the boundaries
-        if (groupSize <= 0) {
-            $("#formNewGuestsFeedback").text("Only positive numbers are allowed.");
-            return;
-        } else if (groupSize > this.seats.length) {
-            $("#formNewGuestsFeedback").text("The group is too big for this restaurant.");
-            return;
-        }
-
+        // Check boundaries
         if(groupSize > this.seats.length - this.numberOfGuests) {
             $("#formNewGuestsFeedback").text("Not enough free seats available.");
             return;
@@ -54,25 +48,14 @@ class SeatPicker {
         }
         this.numberOfGuests += parseInt(groupSize, 10);
 
-        $("#guestTable").text(sp.seats);
+        $("#guestTable").text(this.seats);
     }
 
     removeGuestGroup(uniqueGroupId) {
         $("#formLeavingGuestsFeedback").text("");
 
-        if (uniqueGroupId == "") {
-            return;
-        } else if (isNaN(uniqueGroupId)) {
-            $("#formLeavingGuestsFeedback").text("Only numbers are allowed.");
-            return;
-        }
-
-        // Check boundaries
-        if (uniqueGroupId <= 0) {
-            $("#formLeavingGuestsFeedback").text("The group id needs to be greater than 0.");
-            return;
-        } else if (uniqueGroupId > this.uniqueGroupId) {
-            $("#formLeavingGuestsFeedback").text("No group with id " + uniqueGroupId + " found.");
+        if (!SeatPicker.isInputValid(uniqueGroupId)) {
+            $("#formLeavingGuestsFeedback").text("Invalid input. Only numbers bigger 0 are allowed.");
             return;
         }
 
@@ -90,7 +73,7 @@ class SeatPicker {
             }
         }
 
-        $("#guestTable").text(sp.seats);
+        $("#guestTable").text(this.seats);
     }
 
     findBestFreeSeats(groupSize) {
@@ -104,7 +87,7 @@ class SeatPicker {
             return availableSeats;
         }
 
-        // Get an array of arrays of indices of free seats in a row.
+        // Get an array of index arrays of free seats in a row.
         // Rows with more free seats in a row are further at the back of the array.
         availableSeats = this.findAllFreeSeatsInARow();
         if (availableSeats == null) {
@@ -147,6 +130,7 @@ class SeatPicker {
             } while (this.seats[nextSeatIndex] != this.EMPTY);
         }
 
+        // Search and store all seat rows available in individual arrays
         var startIndex = nextSeatIndex;
         do {
             // Store the indices of free seats in a row
@@ -184,6 +168,7 @@ class SeatPicker {
             // Pick the seat row that is sizewise closest to the group and that is closest to the highest group id
             var highestGroupId = -1;
             var lowestSeatRowLength = availableSeats[0].length;
+            var leftPickAlignment = isPickLeftAligned;
             for (var i = 0; i < availableSeats.length; ++i) {
                 // Only look at seat rows that are the closest to the group's size
                 if (availableSeats[i].length != lowestSeatRowLength) {
@@ -201,15 +186,16 @@ class SeatPicker {
                 var currentHighestGroupId = -1;
                 if (rightGroupId > leftGroupId) {
                     currentHighestGroupId = rightGroupId;
-                    isPickLeftAligned = false;
+                    leftPickAlignment = false;
                 } else {
                     currentHighestGroupId = leftGroupId;
-                    isPickLeftAligned = true;
+                    leftPickAlignment = true;
                 }
 
                 if (currentHighestGroupId > highestGroupId) {
                     highestGroupId = currentHighestGroupId;
                     pickedRowIndex = i;
+                    isPickLeftAligned = leftPickAlignment;
                 }
             }
         }

@@ -15,8 +15,8 @@
             <form id="formNumberOfSeats">
                 <div class="form-group">
                     <label for="numberOfSeats">Number of seats:</label>
-                    <input class="form-control" type="text" id="numberOfSeats" name="numberOfSeats" placeholder="Currently: ">
-                    <small id="numberOfSeatsHelp" class="form-text text-muted">Heads up! Changing this number resets all seats!</small>
+                    <input class="form-control" type="number" min=1 id="numberOfSeats" name="numberOfSeats" placeholder="Currently: ">
+                    <small id="numberOfSeatsHelp" class="form-text text-muted">Heads up! Setting this number resets all seats!</small>
                 </div>
                 <button type="submit" class="btn btn-secondary">Change</button>
             </form>
@@ -26,21 +26,19 @@
             <form id="formNewGuests">
                 <div class="form-group">
                     <label for="newGuests">Number of new guests:</label>
-                    <input class="form-control" type="text" id="newGuests" name="newGuests">
+                    <input class="form-control" type="number" min=1 id="newGuests" name="newGuests">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
-
             <p class="p-feedback" id="formNewGuestsFeedback"></p>            
 
             <form id="formLeavingGuests">
                 <div class="form-group">
                     <label for="leavingGuests">Id of the group leaving:</label>
-                    <input class="form-control" type="text" id="leavingGuests" name="leavingGuests">
+                    <input class="form-control" type="number" min=0 id="leavingGuests" name="leavingGuests">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
-
             <p class="p-feedback" id="formLeavingGuestsFeedback"></p>
             
             <hr>
@@ -58,27 +56,30 @@
 
         <script src="seat-picker.js"></script>
         <script>
-            var sp = new SeatPicker(10);
+            var seatPicker = new SeatPicker(10);
 
+            // Create new seat object on resize
             $("#formNumberOfSeats").on("submit", function(e) {
                 var numberOfSeats = $("#numberOfSeats").val();
-                if (!isNaN(numberOfSeats) && numberOfSeats != "" && numberOfSeats > 0) {
-                    sp = new SeatPicker(numberOfSeats);
+                if (SeatPicker.isInputValid(numberOfSeats)) {
+                    seatPicker = new SeatPicker(numberOfSeats);
                 } else {
-                    alert("Please enter a number bigger than 0.");
+                    alert("Invalid input. Only numbers bigger 0 are allowed.");
                 }
                 e.preventDefault();
             })
 
+            // Pick seats for the guest and place them there
             $("#formNewGuests").on("submit", function(e) {
                 var numberOfNewGuests = $("#newGuests").val();
-                sp.addGuests(numberOfNewGuests);
+                seatPicker.addGuests(numberOfNewGuests);
                 e.preventDefault();
             })
 
+            // Remove a group with the specified id from the seats
             $("#formLeavingGuests").on("submit", function(e) {
                 var groupId = $("#leavingGuests").val();
-                sp.removeGuestGroup(groupId);
+                seatPicker.removeGuestGroup(groupId);
                 e.preventDefault();
             })
         </script>
